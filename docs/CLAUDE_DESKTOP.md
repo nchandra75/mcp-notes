@@ -64,18 +64,14 @@ If the file doesn't exist, create it. If it exists, add the MCP server configura
       "args": ["existing", "args"]
     },
     "obsidian-notes": {
-      "command": "deno",
+      "command": "uv",
       "args": [
         "run",
-        "--allow-read",
-        "--allow-write",
-        "--allow-run",
-        "--allow-env",
-        "/absolute/path/to/mcp-notes/src/main.ts"
+        "/absolute/path/to/mcp-notes/src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian/vault",
-        "GIT_COMMIT_TEMPLATE": "Add AI note: %TITLE%"
+        "GIT_COMMIT_TEMPLATE": "Add AI note: {title}"
       }
     }
   }

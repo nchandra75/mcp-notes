@@ -32,7 +32,7 @@ Creates a new markdown note with YAML frontmatter in your Obsidian vault.
 
 #### Example Usage
 
-````typescript
+````json
 // Creating a comprehensive note
 {
   "title": "Python Async Patterns",
@@ -93,7 +93,7 @@ The search engine scores results based on:
 
 #### Example Usage
 
-```typescript
+```json
 // Basic search
 {
   "query": "async patterns",
@@ -136,7 +136,7 @@ Browse and filter your note collection with sorting options.
 
 #### Example Usage
 
-```typescript
+```json
 // List recent notes
 {
   "limit": 10,
@@ -183,7 +183,7 @@ Retrieve the full content of a specific note by filename.
 
 #### Example Usage
 
-```typescript
+```json
 {
   "filename": "python-async-patterns-2025-06-14.md"
 }

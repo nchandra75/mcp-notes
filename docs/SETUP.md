@@ -6,7 +6,8 @@ This guide will help you set up and configure the MCP Notes server to work with 
 
 Before you begin, ensure you have the following installed:
 
-- **Deno Runtime**: [Install Deno](https://deno.land/install.sh)
+- **Python 3.11+**: [Install Python](https://www.python.org/downloads/)
+- **uv**: [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
 - **Git**: For version control integration (optional but recommended)
 - **Obsidian**: The notes will be saved as markdown files in your Obsidian vault
 - **Claude Desktop**: Or another MCP-compatible AI client
@@ -20,22 +21,23 @@ git clone https://github.com/nchandra75/mcp-notes.git
 cd mcp-notes
 ```
 
-### 2. Verify Deno Installation
+### 2. Verify Python and uv Installation
 
 ```bash
-deno --version
+python --version
+uv --version
 ```
 
-You should see output showing Deno version 2.0 or higher.
+You should see Python 3.11+ and uv installed.
 
-### 3. Test the Server
+### 3. Install Dependencies and Test the Server
 
 ```bash
-# Check TypeScript compilation
-deno check src/main.ts
+# Install Python dependencies
+uv sync
 
 # Test the server (it will exit quickly without stdio input)
-OBSIDIAN_VAULT_PATH="/path/to/your/vault" deno run --allow-read --allow-write --allow-run --allow-env src/main.ts
+OBSIDIAN_VAULT_PATH="/path/to/your/vault" uv run src/mcp_notes/main.py
 ```
 
 ## Configuration
@@ -51,7 +53,7 @@ Example:
 
 ```bash
 export OBSIDIAN_VAULT_PATH="/Users/username/Documents/MyVault"
-export GIT_COMMIT_TEMPLATE="Add AI conversation note: %TITLE%"
+export GIT_COMMIT_TEMPLATE="Add AI conversation note: {title}"
 ```
 
 ### Vault Preparation
@@ -88,18 +90,14 @@ Edit the configuration file and add the MCP Notes server:
 {
   "mcpServers": {
     "obsidian-notes": {
-      "command": "deno",
+      "command": "uv",
       "args": [
         "run",
-        "--allow-read",
-        "--allow-write",
-        "--allow-run",
-        "--allow-env",
-        "/full/path/to/mcp-notes/src/main.ts"
+        "/full/path/to/mcp-notes/src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/full/path/to/your/obsidian/vault",
-        "GIT_COMMIT_TEMPLATE": "Add note: %TITLE%"
+        "GIT_COMMIT_TEMPLATE": "Add note: {title}"
       }
     }
   }
@@ -108,7 +106,7 @@ Edit the configuration file and add the MCP Notes server:
 
 **Important**: Replace the paths with your actual file system paths:
 
-- `/full/path/to/mcp-notes/src/main.ts` → Your MCP server location
+- `/full/path/to/mcp-notes/src/mcp_notes/main.py` → Your MCP server location
 - `/full/path/to/your/obsidian/vault` → Your Obsidian vault location
 
 ### 3. Restart Claude Desktop
@@ -180,7 +178,7 @@ Open Claude Desktop and start a new conversation. The MCP Notes tools should now
 To debug issues, you can run the server manually with logging:
 
 ```bash
-OBSIDIAN_VAULT_PATH="/path/to/vault" deno run --allow-read --allow-write --allow-run --allow-env src/main.ts
+OBSIDIAN_VAULT_PATH="/path/to/vault" uv run src/mcp_notes/main.py
 ```
 
 The server will show startup messages and any errors in the console.
@@ -193,14 +191,14 @@ You can customize git commit messages using the `GIT_COMMIT_TEMPLATE` environmen
 
 ```bash
 # Default template
-GIT_COMMIT_TEMPLATE="Add note: %TITLE%"
+GIT_COMMIT_TEMPLATE="Add note: {title}"
 
 # Custom templates
-GIT_COMMIT_TEMPLATE="📝 AI conversation: %TITLE%"
-GIT_COMMIT_TEMPLATE="[AI] %TITLE% - $(date +%Y-%m-%d)"
+GIT_COMMIT_TEMPLATE="📝 AI conversation: {title}"
+GIT_COMMIT_TEMPLATE="[AI] {title} - $(date +%Y-%m-%d)"
 ```
 
-The `%TITLE%` placeholder will be replaced with the actual note title.
+The `{title}` placeholder will be replaced with the actual note title.
 
 ### Multiple Vault Support
 
@@ -210,28 +208,20 @@ To use multiple vaults, create separate MCP server configurations:
 {
   "mcpServers": {
     "obsidian-work": {
-      "command": "deno",
+      "command": "uv",
       "args": [
         "run",
-        "--allow-read",
-        "--allow-write",
-        "--allow-run",
-        "--allow-env",
-        "/path/to/mcp-notes/src/main.ts"
+        "/path/to/mcp-notes/src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/path/to/work/vault"
       }
     },
     "obsidian-personal": {
-      "command": "deno",
+      "command": "uv",
       "args": [
         "run",
-        "--allow-read",
-        "--allow-write",
-        "--allow-run",
-        "--allow-env",
-        "/path/to/mcp-notes/src/main.ts"
+        "/path/to/mcp-notes/src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/path/to/personal/vault"
