@@ -39,7 +39,9 @@ If the file doesn't exist, create it. If it exists, add the MCP server configura
       "command": "uv",
       "args": [
         "run",
-        "/absolute/path/to/mcp-notes/src/mcp_notes/main.py"
+        "--directory",
+        "/absolute/path/to/mcp-notes",
+        "src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian/vault",
@@ -63,7 +65,9 @@ If the file doesn't exist, create it. If it exists, add the MCP server configura
       "command": "uv",
       "args": [
         "run",
-        "/absolute/path/to/mcp-notes/src/mcp_notes/main.py"
+        "--directory",
+        "/absolute/path/to/mcp-notes",
+        "src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/absolute/path/to/your/obsidian/vault",
@@ -112,7 +116,7 @@ Close Claude Desktop completely and restart it for the configuration changes to 
 
 | Setting               | Description                        | Default               | Example                         |
 | --------------------- | ---------------------------------- | --------------------- | ------------------------------- |
-| `GIT_COMMIT_TEMPLATE` | Custom git commit message template | `"Add note: %TITLE%"` | `"📝 AI conversation: %TITLE%"` |
+| `GIT_COMMIT_TEMPLATE` | Custom git commit message template | `"Add note: {title}"` | `"📝 AI conversation: {title}"` |
 
 ### Permission Flags
 
@@ -146,18 +150,16 @@ The Deno server requires specific permissions:
    {
      "mcpServers": {
        "obsidian-notes": {
-         "command": "deno",
+         "command": "uv",
          "args": [
            "run",
-           "--allow-read",
-           "--allow-write",
-           "--allow-run",
-           "--allow-env",
-           "/Users/john/Documents/mcp-notes/src/main.ts"
+           "--directory",
+           "/Users/john/Documents/mcp-notes",
+           "src/mcp_notes/main.py"
          ],
          "env": {
            "OBSIDIAN_VAULT_PATH": "/Users/john/Documents/MyVault",
-           "GIT_COMMIT_TEMPLATE": "Add note: %TITLE%"
+           "GIT_COMMIT_TEMPLATE": "Add note: {title}"
          }
        }
      }
@@ -183,18 +185,16 @@ The Deno server requires specific permissions:
    {
      "mcpServers": {
        "obsidian-notes": {
-         "command": "deno",
+         "command": "uv",
          "args": [
            "run",
-           "--allow-read",
-           "--allow-write",
-           "--allow-run",
-           "--allow-env",
-           "C:/Users/john/Documents/mcp-notes/src/main.ts"
+           "--directory",
+           "C:/Users/john/Documents/mcp-notes",
+           "src/mcp_notes/main.py"
          ],
          "env": {
            "OBSIDIAN_VAULT_PATH": "C:/Users/john/Documents/MyVault",
-           "GIT_COMMIT_TEMPLATE": "Add note: %TITLE%"
+           "GIT_COMMIT_TEMPLATE": "Add note: {title}"
          }
        }
      }
@@ -220,18 +220,16 @@ The Deno server requires specific permissions:
    {
      "mcpServers": {
        "obsidian-notes": {
-         "command": "deno",
+         "command": "uv",
          "args": [
            "run",
-           "--allow-read",
-           "--allow-write",
-           "--allow-run",
-           "--allow-env",
-           "/home/john/mcp-notes/src/main.ts"
+           "--directory",
+           "/home/john/mcp-notes",
+           "src/mcp_notes/main.py"
          ],
          "env": {
            "OBSIDIAN_VAULT_PATH": "/home/john/Documents/MyVault",
-           "GIT_COMMIT_TEMPLATE": "Add note: %TITLE%"
+           "GIT_COMMIT_TEMPLATE": "Add note: {title}"
          }
        }
      }
@@ -408,7 +406,7 @@ Customize git commit messages and behavior:
 {
   "env": {
     "OBSIDIAN_VAULT_PATH": "/path/to/vault",
-    "GIT_COMMIT_TEMPLATE": "📝 [%CLIENT%] %TITLE% - $(date +%Y-%m-%d)",
+    "GIT_COMMIT_TEMPLATE": "📝 [AI] {title} - $(date +%Y-%m-%d)",
     "GIT_AUTO_PUSH": "false"
   }
 }

@@ -92,12 +92,12 @@ To test the MCP server with Claude Code, use these commands:
 
 ```bash
 # Test the MCP server (requires OBSIDIAN_VAULT_PATH environment variable)
-OBSIDIAN_VAULT_PATH="/path/to/test/vault" uv run src/mcp_notes/main.py
+cd /path/to/mcp-notes && OBSIDIAN_VAULT_PATH="/path/to/test/vault" uv run src/mcp_notes/main.py
 
 # Test with a temporary vault for safe testing
-mkdir -p /tmp/test-vault
-cd /tmp/test-vault && git init
-OBSIDIAN_VAULT_PATH="/tmp/test-vault" uv run /home/nitin/scratch/mcp-notes/src/mcp_notes/main.py
+mkdir -p ./tmp/test-vault
+cd ./tmp/test-vault && git init
+cd /home/nitin/scratch/mcp-notes && OBSIDIAN_VAULT_PATH="./tmp/test-vault" uv run src/mcp_notes/main.py
 ```
 
 ## Available MCP Tools

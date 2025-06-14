@@ -93,7 +93,9 @@ Edit the configuration file and add the MCP Notes server:
       "command": "uv",
       "args": [
         "run",
-        "/full/path/to/mcp-notes/src/mcp_notes/main.py"
+        "--directory",
+        "/full/path/to/mcp-notes",
+        "src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/full/path/to/your/obsidian/vault",
@@ -211,7 +213,9 @@ To use multiple vaults, create separate MCP server configurations:
       "command": "uv",
       "args": [
         "run",
-        "/path/to/mcp-notes/src/mcp_notes/main.py"
+        "--directory",
+        "/path/to/mcp-notes",
+        "src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/path/to/work/vault"
@@ -221,7 +225,9 @@ To use multiple vaults, create separate MCP server configurations:
       "command": "uv",
       "args": [
         "run",
-        "/path/to/mcp-notes/src/mcp_notes/main.py"
+        "--directory",
+        "/path/to/mcp-notes",
+        "src/mcp_notes/main.py"
       ],
       "env": {
         "OBSIDIAN_VAULT_PATH": "/path/to/personal/vault"
