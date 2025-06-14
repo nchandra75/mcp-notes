@@ -45,12 +45,20 @@ export function createDefaultFrontmatter(
 ): NoteFrontmatter {
   const now = new Date().toISOString();
 
-  return {
+  const frontmatter: NoteFrontmatter = {
     created: now,
     updated: now,
-    conversation_id: conversationId,
     tags,
-    ai_client: aiClient,
     summary: summary || `Note about ${title}`,
   };
+
+  // Only add optional fields if they have values
+  if (conversationId) {
+    frontmatter.conversation_id = conversationId;
+  }
+  if (aiClient) {
+    frontmatter.ai_client = aiClient;
+  }
+
+  return frontmatter;
 }

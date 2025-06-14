@@ -155,12 +155,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     switch (name) {
       case "create_note": {
         const params = args as unknown as CreateNoteParams;
+        
+        // Validate required parameters
+        if (!params || typeof params !== 'object') {
+          throw new Error("Invalid parameters: expected object");
+        }
+        if (!params.title || typeof params.title !== 'string') {
+          throw new Error("Missing required parameter: title (string)");
+        }
+        if (!params.content || typeof params.content !== 'string') {
+          throw new Error("Missing required parameter: content (string)");
+        }
+        
         await fileManager.ensureVaultExists();
 
         const filename = fileManager.generateFilename(params.title);
         const frontmatter = createDefaultFrontmatter(
           params.title,
-          params.summary,
+          params.summary || `Note about ${params.title}`,
           params.tags || [],
           params.conversation_id,
           params.ai_client,
@@ -178,10 +190,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: "text" as const,
-              text:
-                `Note created successfully:\n\nFilename: ${filename}\nPath: ${vaultPath}/${filename}\nGit commit: ${
-                  commitHash || "No git repository found"
-                }\n\nThe note has been saved to your Obsidian vault and is ready to use.`,
+              text: `Note created successfully:\n\nFilename: ${filename}\nPath: ${vaultPath}/${filename}\nGit commit: ${commitHash || "No git repository found"}\n\nThe note has been saved to your Obsidian vault and is ready to use.`,
             },
           ],
         };
@@ -189,6 +198,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "search_notes": {
         const params = args as unknown as SearchNotesParams;
+        
+        // Validate required parameters
+        if (!params || typeof params !== 'object') {
+          throw new Error("Invalid parameters: expected object");
+        }
+        if (!params.query || typeof params.query !== 'string') {
+          throw new Error("Missing required parameter: query (string)");
+        }
+        
         await fileManager.ensureVaultExists();
 
         const noteFiles = await fileManager.listNoteFiles();
@@ -319,6 +337,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "get_note": {
         const params = args as unknown as { filename: string };
+        
+        // Validate required parameters
+        if (!params || typeof params !== 'object') {
+          throw new Error("Invalid parameters: expected object");
+        }
+        if (!params.filename || typeof params.filename !== 'string') {
+          throw new Error("Missing required parameter: filename (string)");
+        }
+        
         await fileManager.ensureVaultExists();
 
         const note = await fileManager.readNote(params.filename);

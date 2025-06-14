@@ -83,3 +83,24 @@ Notes use markdown with YAML frontmatter:
 - Search functionality requires full-text indexing across note content
 - TypeScript interfaces should match the frontmatter schema exactly
 - Error handling is critical for file system and git operations
+
+## MCP Server Configuration for Claude Code
+
+To test the MCP server with Claude Code, use these commands:
+
+```bash
+# Test the MCP server (requires OBSIDIAN_VAULT_PATH environment variable)
+OBSIDIAN_VAULT_PATH="/path/to/test/vault" deno run --allow-read --allow-write --allow-run --allow-env src/main.ts
+
+# Test with a temporary vault for safe testing
+mkdir -p /tmp/test-vault
+cd /tmp/test-vault && git init
+OBSIDIAN_VAULT_PATH="/tmp/test-vault" deno run --allow-read --allow-write --allow-run --allow-env /home/nitin/scratch/mcp-notes/src/main.ts
+```
+
+## Available MCP Tools
+
+1. **create_note** - Create new markdown notes with frontmatter
+2. **search_notes** - Search existing notes with relevance scoring  
+3. **list_notes** - Browse and filter notes with sorting options
+4. **get_note** - Retrieve complete note content by filename
