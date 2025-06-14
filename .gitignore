@@ -1,0 +1,48 @@
+# Deno
+.deno/
+deno.lock
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node modules (in case npm is used alongside Deno)
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Temporary files
+tmp/
+temp/
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Obsidian vault files (if testing locally)
+*.obsidian/
