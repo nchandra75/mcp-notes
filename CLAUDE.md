@@ -16,7 +16,7 @@ uv init --name mcp-notes --python 3.11
 uv add mcp pydantic pyyaml gitpython
 
 # Run the MCP server
-OBSIDIAN_VAULT_PATH="/path/to/vault" uv run src/mcp_notes/main.py
+cd /path/to/mcp-notes && OBSIDIAN_VAULT_PATH="/path/to/vault" uv run src/mcp_notes/main.py
 
 # Format code
 uv run ruff format

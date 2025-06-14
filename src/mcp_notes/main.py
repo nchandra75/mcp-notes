@@ -8,17 +8,24 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
-from .config.settings import get_vault_path
-from .lib.file_manager import FileManager
-from .lib.git import GitManager
-from .lib.search import SearchEngine
-from .lib.markdown import (
+import sys
+from pathlib import Path
+
+# Add src to path so we can import our modules
+src_path = Path(__file__).parent.parent
+sys.path.insert(0, str(src_path))
+
+from mcp_notes.config.settings import get_vault_path
+from mcp_notes.lib.file_manager import FileManager
+from mcp_notes.lib.git import GitManager
+from mcp_notes.lib.search import SearchEngine
+from mcp_notes.lib.markdown import (
     create_default_frontmatter, 
     format_markdown, 
     parse_markdown,
     extract_title_from_content
 )
-from .lib.types import (
+from mcp_notes.lib.types import (
     CreateNoteParams,
     SearchNotesParams, 
     ListNotesParams,
