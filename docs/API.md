@@ -29,6 +29,7 @@ Creates a new markdown note with YAML frontmatter in your Obsidian vault.
 | `conversation_id` | string   | ❌       | Unique identifier for the conversation              |
 | `ai_client`       | string   | ❌       | Name of the AI client used (e.g., "claude-desktop") |
 | `summary`         | string   | ❌       | Brief one-line summary of the note content          |
+| `date_for`        | string   | ❌       | Natural language date (e.g., "yesterday", "last friday") |
 
 #### Example Usage
 
@@ -36,11 +37,20 @@ Creates a new markdown note with YAML frontmatter in your Obsidian vault.
 // Creating a comprehensive note
 {
   "title": "Python Async Patterns",
-  "content": "# Python Async Patterns\n\n## Key Learnings\n\n- Use `asyncio.gather()` for concurrent execution\n- `async with` for async context managers\n- Avoid blocking calls in async functions\n\n## Code Example\n\n```python\nimport asyncio\n\nasync def fetch_data(url):\n    async with aiohttp.ClientSession() as session:\n        async with session.get(url) as response:\n            return await response.json()\n```\n\n## Follow-up Questions\n\n- How to handle exceptions in async code?\n- Best practices for async database operations?\n\nCreated: [[2025-06-14]]",
+  "content": "# Python Async Patterns\n\n## Key Learnings\n\n- Use `asyncio.gather()` for concurrent execution\n- `async with` for async context managers\n- Avoid blocking calls in async functions\n\n## Code Example\n\n```python\nimport asyncio\n\nasync def fetch_data(url):\n    async with aiohttp.ClientSession() as session:\n        async with session.get(url) as response:\n            return await response.json()\n```\n\n## Follow-up Questions\n\n- How to handle exceptions in async code?\n- Best practices for async database operations?",
   "tags": ["python", "async", "programming", "best-practices"],
   "conversation_id": "conv_20250614_001",
   "ai_client": "claude-desktop",
   "summary": "Discussion about Python async/await patterns and best practices"
+}
+
+// Creating a note for a different date
+{
+  "title": "Meeting Notes",
+  "content": "# Team Meeting Notes\n\n## Action Items\n- Review code changes\n- Update documentation",
+  "date_for": "yesterday",
+  "tags": ["meeting", "team"],
+  "summary": "Weekly team meeting discussion"
 }
 ````
 

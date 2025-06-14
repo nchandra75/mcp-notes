@@ -26,6 +26,9 @@ uv run ruff check
 
 # Type check
 uv run mypy src/mcp_notes
+
+# Run tests
+uv run pytest tests/ -v
 ```
 
 ## Architecture

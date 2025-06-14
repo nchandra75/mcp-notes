@@ -40,6 +40,7 @@ class CreateNoteParams(BaseModel):
     tags: Optional[List[str]] = None
     conversation_id: Optional[str] = None
     ai_client: Optional[str] = None
+    date_for: Optional[str] = None  # Natural language date like "2 days ago", "last friday"
 
 
 class SearchNotesParams(BaseModel):

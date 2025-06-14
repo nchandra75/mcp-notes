@@ -23,7 +23,13 @@ from mcp_notes.lib.markdown import (
     create_default_frontmatter, 
     format_markdown, 
     parse_markdown,
-    extract_title_from_content
+    extract_title_from_content,
+    generate_filename
+)
+from mcp_notes.lib.date_parser import (
+    parse_natural_date,
+    format_date_for_filename,
+    format_date_for_backlink
 )
 from mcp_notes.lib.types import (
     CreateNoteParams,
@@ -65,7 +71,8 @@ class MCPNotesServer:
                                 "description": "Tags for categorization"
                             },
                             "conversation_id": {"type": "string", "description": "ID of related conversation"},
-                            "ai_client": {"type": "string", "description": "AI client that created the note"}
+                            "ai_client": {"type": "string", "description": "AI client that created the note"},
+                            "date_for": {"type": "string", "description": "Natural language date for the note (e.g., '2 days ago', 'last friday', 'yesterday')"}
                         },
                         "required": ["title", "content"]
                     }
@@ -136,8 +143,24 @@ class MCPNotesServer:
         try:
             params = CreateNoteParams(**args)
             
-            # Generate filename
-            filename = self.file_manager.generate_filename(params.title)
+            # Determine the date to use for the note
+            from datetime import datetime
+            
+            if params.date_for:
+                # Parse natural language date
+                target_date = parse_natural_date(params.date_for)
+                if target_date is None:
+                    return [TextContent(
+                        type="text",
+                        text=f"Error: Could not parse date '{params.date_for}'. Please use formats like '2 days ago', 'last friday', 'yesterday', etc."
+                    )]
+            else:
+                # Use current date
+                target_date = datetime.now()
+            
+            # Generate filename with target date
+            filename_date = format_date_for_filename(target_date)
+            filename = generate_filename(params.title, filename_date)
             
             # Check if note already exists
             if self.file_manager.note_exists(filename):
@@ -156,9 +179,8 @@ class MCPNotesServer:
             )
             
             # Add date backlink to content
-            from datetime import datetime
-            creation_date = datetime.now().strftime('%Y-%m-%d')
-            content_with_date = f"{params.content}\n\nCreated: [[{creation_date}]]"
+            backlink_date = format_date_for_backlink(target_date)
+            content_with_date = f"{params.content}\n\nCreated: [[{backlink_date}]]"
             
             # Format complete markdown
             full_content = format_markdown(frontmatter, content_with_date)
