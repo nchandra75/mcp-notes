@@ -5,6 +5,7 @@ export interface NoteFrontmatter {
   tags: string[];
   ai_client?: string;
   summary: string;
+  [key: string]: unknown;
 }
 
 export interface Note {

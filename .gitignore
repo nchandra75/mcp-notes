@@ -46,3 +46,6 @@ coverage/
 
 # Obsidian vault files (if testing locally)
 *.obsidian/
+
+# Local settings and permissions
+.claude/settings.local.json

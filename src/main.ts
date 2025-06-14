@@ -8,6 +8,23 @@ import {
   Tool,
 } from "npm:@modelcontextprotocol/sdk/types.js";
 
+import { FileManager } from "./lib/file_manager.ts";
+import { GitManager } from "./lib/git.ts";
+import { SearchEngine } from "./lib/search.ts";
+import { createDefaultFrontmatter } from "./lib/markdown.ts";
+import { CreateNoteParams, ListNotesParams, SearchNotesParams } from "./lib/types.ts";
+
+// Initialize managers
+const vaultPath = Deno.env.get("OBSIDIAN_VAULT_PATH");
+if (!vaultPath) {
+  console.error("Error: OBSIDIAN_VAULT_PATH environment variable is required");
+  Deno.exit(1);
+}
+
+const fileManager = new FileManager(vaultPath);
+const gitManager = new GitManager(vaultPath);
+const searchEngine = new SearchEngine();
+
 const server = new Server(
   {
     name: "mcp-notes",
@@ -131,54 +148,207 @@ server.setRequestHandler(ListToolsRequestSchema, () => {
   return { tools };
 });
 
-server.setRequestHandler(CallToolRequestSchema, (request) => {
-  const { name } = request.params;
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
 
   try {
     switch (name) {
-      case "create_note":
-        // TODO: Implement create_note tool
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "create_note tool not yet implemented",
-            },
-          ],
-        };
+      case "create_note": {
+        const params = args as unknown as CreateNoteParams;
+        await fileManager.ensureVaultExists();
 
-      case "search_notes":
-        // TODO: Implement search_notes tool
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "search_notes tool not yet implemented",
-            },
-          ],
-        };
+        const filename = fileManager.generateFilename(params.title);
+        const frontmatter = createDefaultFrontmatter(
+          params.title,
+          params.summary,
+          params.tags || [],
+          params.conversation_id,
+          params.ai_client,
+        );
 
-      case "list_notes":
-        // TODO: Implement list_notes tool
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "list_notes tool not yet implemented",
-            },
-          ],
-        };
+        await fileManager.writeNote(filename, frontmatter, params.content);
 
-      case "get_note":
-        // TODO: Implement get_note tool
+        // Attempt git commit if repository exists
+        let commitHash = "";
+        if (await gitManager.isGitRepo()) {
+          commitHash = await gitManager.commitNote(filename, params.title);
+        }
+
         return {
           content: [
             {
               type: "text" as const,
-              text: "get_note tool not yet implemented",
+              text:
+                `Note created successfully:\n\nFilename: ${filename}\nPath: ${vaultPath}/${filename}\nGit commit: ${
+                  commitHash || "No git repository found"
+                }\n\nThe note has been saved to your Obsidian vault and is ready to use.`,
             },
           ],
         };
+      }
+
+      case "search_notes": {
+        const params = args as unknown as SearchNotesParams;
+        await fileManager.ensureVaultExists();
+
+        const noteFiles = await fileManager.listNoteFiles();
+        const notes = [];
+
+        for (const filename of noteFiles) {
+          const note = await fileManager.readNote(filename);
+          if (note) {
+            notes.push(note);
+          }
+        }
+
+        const results = searchEngine.searchNotes(notes, params.query, params.tags);
+        const limitedResults = results.slice(0, params.limit || 10);
+
+        if (limitedResults.length === 0) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: `No notes found matching query: "${params.query}"`,
+              },
+            ],
+          };
+        }
+
+        const resultText = limitedResults.map((result, index) => {
+          const note = result.note;
+          return `${index + 1}. **${note.filename}** (Score: ${result.score.toFixed(1)})\n` +
+            `   Summary: ${note.frontmatter.summary}\n` +
+            `   Tags: ${note.frontmatter.tags.join(", ")}\n` +
+            `   Created: ${new Date(note.frontmatter.created).toLocaleDateString()}\n` +
+            `   Matches: ${result.matches.join("; ")}\n`;
+        }).join("\n");
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text:
+                `Found ${limitedResults.length} notes matching "${params.query}":\n\n${resultText}`,
+            },
+          ],
+        };
+      }
+
+      case "list_notes": {
+        const params = (args as unknown as ListNotesParams) || {};
+        await fileManager.ensureVaultExists();
+
+        const noteFiles = await fileManager.listNoteFiles();
+        const notes = [];
+
+        for (const filename of noteFiles) {
+          const note = await fileManager.readNote(filename);
+          if (note) {
+            // Filter by tags if specified
+            if (params.tags && params.tags.length > 0) {
+              const hasMatchingTag = params.tags.some((tag) => note.frontmatter.tags.includes(tag));
+              if (!hasMatchingTag) continue;
+            }
+            notes.push(note);
+          }
+        }
+
+        // Sort notes
+        const sortField = params.sort || "updated";
+        const sortOrder = params.order || "desc";
+
+        notes.sort((a, b) => {
+          let aValue, bValue;
+
+          switch (sortField) {
+            case "created":
+              aValue = new Date(a.frontmatter.created).getTime();
+              bValue = new Date(b.frontmatter.created).getTime();
+              break;
+            case "updated":
+              aValue = new Date(a.frontmatter.updated).getTime();
+              bValue = new Date(b.frontmatter.updated).getTime();
+              break;
+            case "title":
+              aValue = a.filename.toLowerCase();
+              bValue = b.filename.toLowerCase();
+              break;
+            default:
+              aValue = new Date(a.frontmatter.updated).getTime();
+              bValue = new Date(b.frontmatter.updated).getTime();
+          }
+
+          if (sortOrder === "asc") {
+            return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+          } else {
+            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+          }
+        });
+
+        const limitedNotes = notes.slice(0, params.limit || 20);
+
+        if (limitedNotes.length === 0) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: "No notes found in the vault.",
+              },
+            ],
+          };
+        }
+
+        const notesList = limitedNotes.map((note, index) => {
+          return `${index + 1}. **${note.filename}**\n` +
+            `   Summary: ${note.frontmatter.summary}\n` +
+            `   Tags: ${note.frontmatter.tags.join(", ")}\n` +
+            `   Created: ${new Date(note.frontmatter.created).toLocaleDateString()}\n` +
+            `   Updated: ${new Date(note.frontmatter.updated).toLocaleDateString()}\n`;
+        }).join("\n");
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Found ${limitedNotes.length} notes in your vault:\n\n${notesList}`,
+            },
+          ],
+        };
+      }
+
+      case "get_note": {
+        const params = args as unknown as { filename: string };
+        await fileManager.ensureVaultExists();
+
+        const note = await fileManager.readNote(params.filename);
+
+        if (!note) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text:
+                  `Note not found: ${params.filename}\n\nMake sure the filename is correct and the note exists in your vault.`,
+              },
+            ],
+          };
+        }
+
+        const frontmatterText = Object.entries(note.frontmatter)
+          .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
+          .join("\n");
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text:
+                `**${note.filename}**\n\n**Frontmatter:**\n${frontmatterText}\n\n**Content:**\n${note.content}`,
+            },
+          ],
+        };
+      }
 
       default:
         throw new Error(`Unknown tool: ${name}`);
