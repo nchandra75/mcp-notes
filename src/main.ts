@@ -172,8 +172,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const filename = fileManager.generateFilename(params.title);
         const frontmatter = createDefaultFrontmatter(
           params.title,
-          params.summary || `Note about ${params.title}`,
-          params.tags || [],
+          params.summary,
+          params.tags,
           params.conversation_id,
           params.ai_client,
         );
