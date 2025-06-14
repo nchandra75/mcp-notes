@@ -1,0 +1,1 @@
+"""MCP Notes server package."""

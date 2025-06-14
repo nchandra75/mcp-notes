@@ -4,25 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an MCP (Model Context Protocol) server that enables AI assistants to create, search, and manage conversation summaries as markdown notes in Obsidian vaults. The project uses Deno/TypeScript and integrates with Claude Desktop via stdio/JSON-RPC.
+This is an MCP (Model Context Protocol) server that enables AI assistants to create, search, and manage conversation summaries as markdown notes in Obsidian vaults. The project uses Python with uv for dependency management and integrates with Claude Desktop via stdio/JSON-RPC.
 
 ## Development Commands
 
 ```bash
-# Initialize Deno project
-deno init
+# Initialize Python project with uv
+uv init --name mcp-notes --python 3.11
+
+# Install dependencies
+uv add mcp pydantic pyyaml gitpython
 
 # Run the MCP server
-deno run --allow-read --allow-write --allow-run --allow-env src/main.ts
-
-# Check TypeScript
-deno check src/main.ts
+OBSIDIAN_VAULT_PATH="/path/to/vault" uv run src/mcp_notes/main.py
 
 # Format code
-deno fmt
+uv run ruff format
 
-# Lint code
-deno lint
+# Lint code  
+uv run ruff check
+
+# Type check
+uv run mypy src/mcp_notes
 ```
 
 ## Architecture
@@ -30,7 +33,7 @@ deno lint
 The MCP server acts as a bridge between AI clients and Obsidian vaults:
 
 - **Protocol**: JSON-RPC over stdio
-- **Runtime**: Deno with TypeScript
+- **Runtime**: Python 3.11+ with uv dependency management
 - **Storage**: Markdown files with YAML frontmatter
 - **Integration**: Direct file system access to Obsidian vault
 - **Version Control**: Git commits for each note creation
@@ -46,21 +49,20 @@ The MCP server acts as a bridge between AI clients and Obsidian vaults:
 ## Project Structure
 
 ```
-src/
-├── main.ts              # MCP server entry point
-├── tools/               # MCP tool implementations
-│   ├── create_note.ts
-│   ├── search_notes.ts
-│   ├── list_notes.ts
-│   └── get_note.ts
+src/mcp_notes/
+├── main.py              # MCP server entry point
 ├── lib/                 # Core utilities
-│   ├── file_manager.ts  # File system operations
-│   ├── markdown.ts      # Markdown formatting
-│   ├── search.ts        # Search functionality
-│   ├── git.ts           # Git operations
-│   └── types.ts         # TypeScript interfaces
+│   ├── __init__.py
+│   ├── file_manager.py  # File system operations
+│   ├── markdown.py      # Markdown formatting
+│   ├── search.py        # Search functionality
+│   ├── git.py           # Git operations
+│   └── types.py         # Pydantic models and types
+├── tools/               # MCP tool implementations (integrated in main.py)
+│   └── __init__.py
 └── config/
-    └── settings.ts      # Configuration management
+    ├── __init__.py
+    └── settings.py      # Configuration management
 ```
 
 ## Note Format
@@ -81,7 +83,7 @@ Notes use markdown with YAML frontmatter:
 - File operations must be safe (kebab-case naming, no spaces)
 - All note creation should include git commits
 - Search functionality requires full-text indexing across note content
-- TypeScript interfaces should match the frontmatter schema exactly
+- Pydantic models should match the frontmatter schema exactly
 - Error handling is critical for file system and git operations
 
 ## MCP Server Configuration for Claude Code
@@ -90,12 +92,12 @@ To test the MCP server with Claude Code, use these commands:
 
 ```bash
 # Test the MCP server (requires OBSIDIAN_VAULT_PATH environment variable)
-OBSIDIAN_VAULT_PATH="/path/to/test/vault" deno run --allow-read --allow-write --allow-run --allow-env src/main.ts
+OBSIDIAN_VAULT_PATH="/path/to/test/vault" uv run src/mcp_notes/main.py
 
 # Test with a temporary vault for safe testing
 mkdir -p /tmp/test-vault
 cd /tmp/test-vault && git init
-OBSIDIAN_VAULT_PATH="/tmp/test-vault" deno run --allow-read --allow-write --allow-run --allow-env /home/nitin/scratch/mcp-notes/src/main.ts
+OBSIDIAN_VAULT_PATH="/tmp/test-vault" uv run /home/nitin/scratch/mcp-notes/src/mcp_notes/main.py
 ```
 
 ## Available MCP Tools
@@ -104,3 +106,7 @@ OBSIDIAN_VAULT_PATH="/tmp/test-vault" deno run --allow-read --allow-write --allo
 2. **search_notes** - Search existing notes with relevance scoring  
 3. **list_notes** - Browse and filter notes with sorting options
 4. **get_note** - Retrieve complete note content by filename
+
+## Testing Notes
+
+- For tests, use "./tmp" instead of "/tmp" as you don't have direct access to /tmp. Clean up after the test.
