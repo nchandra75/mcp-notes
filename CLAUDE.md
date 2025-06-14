@@ -72,6 +72,7 @@ Notes use markdown with YAML frontmatter:
 - **Naming**: kebab-case filenames (e.g., `python-async-patterns-2025-06-14.md`)
 - **Frontmatter**: created, updated, conversation_id, tags, ai_client, summary
 - **Structure**: Title, Key Learnings, Code Snippets, Follow-up Questions, References
+- **Date Backlink**: Automatically appends `Created: [[YYYY-MM-DD]]` for Obsidian navigation
 
 ## Environment Configuration
 

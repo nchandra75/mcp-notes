@@ -11,7 +11,7 @@ The MCP Notes server provides four main tools for managing markdown notes in Obs
 3. **`list_notes`** - Browse and filter your note collection
 4. **`get_note`** - Retrieve the full content of specific notes
 
-All notes are created with YAML frontmatter and stored as markdown files using kebab-case naming conventions.
+All notes are created with YAML frontmatter and stored as markdown files using kebab-case naming conventions. Each note automatically includes a date backlink in the format `Created: [[YYYY-MM-DD]]` for easy navigation in Obsidian.
 
 ## Tools Reference
 
@@ -36,7 +36,7 @@ Creates a new markdown note with YAML frontmatter in your Obsidian vault.
 // Creating a comprehensive note
 {
   "title": "Python Async Patterns",
-  "content": "# Python Async Patterns\n\n## Key Learnings\n\n- Use `asyncio.gather()` for concurrent execution\n- `async with` for async context managers\n- Avoid blocking calls in async functions\n\n## Code Example\n\n```python\nimport asyncio\n\nasync def fetch_data(url):\n    async with aiohttp.ClientSession() as session:\n        async with session.get(url) as response:\n            return await response.json()\n```\n\n## Follow-up Questions\n\n- How to handle exceptions in async code?\n- Best practices for async database operations?",
+  "content": "# Python Async Patterns\n\n## Key Learnings\n\n- Use `asyncio.gather()` for concurrent execution\n- `async with` for async context managers\n- Avoid blocking calls in async functions\n\n## Code Example\n\n```python\nimport asyncio\n\nasync def fetch_data(url):\n    async with aiohttp.ClientSession() as session:\n        async with session.get(url) as response:\n            return await response.json()\n```\n\n## Follow-up Questions\n\n- How to handle exceptions in async code?\n- Best practices for async database operations?\n\nCreated: [[2025-06-14]]",
   "tags": ["python", "async", "programming", "best-practices"],
   "conversation_id": "conv_20250614_001",
   "ai_client": "claude-desktop",

@@ -155,8 +155,13 @@ class MCPNotesServer:
                 params.ai_client
             )
             
+            # Add date backlink to content
+            from datetime import datetime
+            creation_date = datetime.now().strftime('%Y-%m-%d')
+            content_with_date = f"{params.content}\n\nCreated: [[{creation_date}]]"
+            
             # Format complete markdown
-            full_content = format_markdown(frontmatter, params.content)
+            full_content = format_markdown(frontmatter, content_with_date)
             
             # Write note
             self.file_manager.write_note(filename, full_content)
